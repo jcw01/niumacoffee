@@ -31,6 +31,8 @@ export default function Result() {
   const [shareCode, setShareCode] = useState('');
   const [scoreDisplay, setScoreDisplay] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [wechatGuide, setWechatGuide] = useState(false);
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -84,6 +86,20 @@ export default function Result() {
   const handleShareToFriend = useCallback(async () => {
     if (!result) return;
     trackEvent('share_click');
+    const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+
+    if (isWechat) {
+      // 微信环境：复制链接 + 显示引导
+      try {
+        await navigator.clipboard.writeText(`${window.location.origin}?share=${shareCode}`);
+      } catch {
+        // fallback
+      }
+      setWechatGuide(true);
+      return;
+    }
+
+    // 非微信环境：优先 Web Share API
     const text = generateShareText(result.level.emoji, result.level.title, result.percentage, result.level.shareText);
     const status = await shareToWeb({
       title: text.title,
@@ -104,13 +120,12 @@ export default function Result() {
         useCORS: true,
         logging: false,
       });
-      const link = document.createElement('a');
-      link.download = `牛马等级-${result.level.title}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      showToast('✅ 图片已保存');
+      const dataUrl = canvas.toDataURL('image/png');
+      // 移动端：显示预览图供长按保存
+      setPreviewImage(dataUrl);
+      showToast('✅ 长按图片即可保存');
     } catch {
-      showToast('❌ 保存失败，请重试');
+      showToast('❌ 生成失败，请重试');
     }
   }, [result, showToast]);
 
@@ -141,7 +156,7 @@ export default function Result() {
           style={{
             position: 'relative',
             width: '100%',
-            maxWidth: 400,
+            maxWidth: 'min(100%, 400px)',
             margin: '0 auto',
             padding: 'clamp(12px, 3vw, 18px)',
             borderRadius: 22,
@@ -306,16 +321,16 @@ export default function Result() {
                   border: '3px solid ' + INK,
                   borderRadius: 12,
                   boxShadow: '3px 3px 0 0 ' + INK,
-                  padding: '8px 10px',
+                  padding: 'clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 10px)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 10,
+                  gap: 'clamp(6px, 2vw, 10px)',
                 }}
               >
                 <div
                   style={{
-                    width: 'clamp(52px, 14vw, 68px)',
-                    height: 'clamp(52px, 14vw, 68px)',
+                    width: 'clamp(48px, 13vw, 68px)',
+                    height: 'clamp(48px, 13vw, 68px)',
                     flexShrink: 0,
                     border: '2px solid ' + INK,
                     borderRadius: 8,
@@ -327,7 +342,7 @@ export default function Result() {
                 >
                   <QRCodeSVG
                     value={`${window.location.origin}?share=${shareCode}`}
-                    size={56}
+                    size={52}
                     bgColor="#ffffff"
                     fgColor={INK}
                     level="M"
@@ -373,7 +388,8 @@ export default function Result() {
 
         {/* ========== 操作按钮 ========== */}
         <motion.div
-          className="space-y-3 flex-shrink-0 pb-4"
+          className="space-y-3 flex-shrink-0"
+          style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
@@ -427,6 +443,50 @@ export default function Result() {
             }}
           >
             {toast}
+          </div>
+        </div>
+      )}
+
+      {/* 图片预览遮罩层 - 长按保存 */}
+      {previewImage && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4"
+          style={{ background: 'rgba(0,0,0,0.85)' }}
+          onClick={() => setPreviewImage(null)}
+        >
+          <img
+            src={previewImage}
+            alt="牛马等级战绩图"
+            style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 12, border: '3px solid #141414' }}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <p style={{ color: '#fff', marginTop: 16, fontWeight: 900, fontSize: 14, letterSpacing: 1 }}>
+            长按图片保存到相册
+          </p>
+          <button
+            onClick={(e) => { e.stopPropagation(); setPreviewImage(null); }}
+            style={{ color: '#fff', marginTop: 12, fontSize: 13, textDecoration: 'underline' }}
+          >
+            关闭
+          </button>
+        </div>
+      )}
+
+      {/* 微信分享引导遮罩层 */}
+      {wechatGuide && (
+        <div
+          className="fixed inset-0 z-50"
+          style={{ background: 'rgba(0,0,0,0.85)' }}
+          onClick={() => setWechatGuide(false)}
+        >
+          <div style={{ position: 'absolute', top: 10, right: 20, textAlign: 'right' }}>
+            <span style={{ fontSize: 60 }}>👆</span>
+            <p style={{ color: '#fff', fontWeight: 900, fontSize: 16, marginTop: 8 }}>
+              点击右上角「...」
+            </p>
+            <p style={{ color: '#FFE135', fontWeight: 700, fontSize: 13, marginTop: 4 }}>
+              分享到朋友圈 / 微信好友
+            </p>
           </div>
         </div>
       )}

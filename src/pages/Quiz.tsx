@@ -5,7 +5,11 @@ import { questions as setA } from '../data/questions';
 import { questions as setB } from '../data/questions-b';
 import { questions as setC } from '../data/questions-c';
 import { questions as setCampus } from '../data/questions-campus';
+import { questions as setCampusB } from '../data/questions-campus-b';
+import { questions as setCampusC } from '../data/questions-campus-c';
 import { questions as setLove } from '../data/questions-love';
+import { questions as setLoveB } from '../data/questions-love-b';
+import { questions as setLoveC } from '../data/questions-love-c';
 import type { Question } from '../data/questions';
 import ProgressBar from '../components/ProgressBar';
 import OptionCard from '../components/OptionCard';
@@ -27,8 +31,8 @@ function shuffle<T>(arr: T[]): T[] {
 // 版本配置映射：每套版本的题库来源、抽题数量和显示标签
 const versionConfig: Record<string, { sets: Question[][]; count: number; label: string }> = {
   workplace: { sets: [setA, setB, setC], count: 30, label: '🏢 职场牛马版' },
-  campus: { sets: [setCampus], count: 20, label: '🎓 校园牛马版' },
-  love: { sets: [setLove], count: 20, label: '💕 恋爱牛马版' },
+  campus: { sets: [setCampus, setCampusB, setCampusC], count: 30, label: '🎓 校园牛马版' },
+  love: { sets: [setLove, setLoveB, setLoveC], count: 30, label: '💕 恋爱牛马版' },
 };
 
 // 根据版本从对应题库抽题
@@ -316,7 +320,10 @@ export default function Quiz() {
       {/* 底部操作栏：上一题 / 下一题 / 查看结果 */}
       <footer
         className="fixed bottom-0 left-0 right-0 z-20 px-4 py-4 max-w-lg mx-auto"
-        style={{ background: 'linear-gradient(transparent, #FFE135 30%)' }}
+        style={{
+          background: 'linear-gradient(transparent, #FFE135 30%)',
+          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+        }}
       >
         <div className="flex gap-3">
           {currentIndex > 0 && (

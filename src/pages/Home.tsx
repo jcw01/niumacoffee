@@ -76,6 +76,7 @@ export default function Home() {
         <motion.div
           className="w-full mb-5 px-4 py-6 sm:px-6 sm:py-8 rounded-[20px] bg-white text-center"
           style={{
+            maxWidth: 'min(100%, 420px)',
             border: '4px solid #141414',
             boxShadow: '6px 6px 0 0 #141414',
           }}
@@ -176,8 +177,8 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 题库版本选择器 */}
-        <div className="flex gap-2 mb-5 w-full" style={{ justifyContent: 'center' }}>
+        {/* 题库版本选择器 - 小屏时允许换行实现 2+1 布局 */}
+        <div className="flex flex-wrap gap-2 mb-5 w-full" style={{ justifyContent: 'center' }}>
           {versions.map((v, i) => {
             const isSelected = selectedVersion === v.id;
             return (
@@ -186,8 +187,9 @@ export default function Home() {
                 onClick={() => setSelectedVersion(v.id)}
                 className="flex flex-col items-center rounded-[14px] font-black"
                 style={{
-                  flex: '1 1 0',
+                  flex: '1 1 clamp(90px, 28vw, 130px)',
                   maxWidth: 'clamp(100px, 28vw, 130px)',
+                  minWidth: '90px',
                   padding: 'clamp(8px, 2vw, 12px) clamp(4px, 1vw, 8px)',
                   background: isSelected ? '#FFE135' : '#FFFFFF',
                   border: isSelected ? '3px solid #FF2D7A' : '3px solid #141414',

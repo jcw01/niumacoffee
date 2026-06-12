@@ -73,6 +73,8 @@ body {
   padding-bottom: var(--sab);
   padding-left: var(--sal);
   padding-right: var(--sar);
+  /* 防止 iOS Safari 弹性滚动导致页面抖动 */
+  overscroll-behavior-y: none;
 }
 
 #root {
@@ -180,20 +182,49 @@ body {
   box-shadow: 2px 2px 0 0 var(--ink);
 }
 
-/* ========== 响应式工具 ========== */
-/* 小屏手机（<375px）缩小阴影和描边 */
-@media (max-width: 374px) {
-  .btn-comic-pink,
-  .btn-comic-white {
+/* ========== 响应式断点 ========== */
+
+/* 超小屏手机（如 iPhone SE 1st gen, 320px） */
+@media (max-width: 359px) {
+  html { font-size: 14px; }
+  .btn-comic-pink, .btn-comic-white {
     border-width: 2px;
     box-shadow: 3px 3px 0 0 var(--ink);
     padding: 10px 14px;
+    font-size: clamp(12px, 3.5vw, 14px);
   }
 }
 
-/* 微信浏览器内嵌 WebView 兼容 */
+/* 小屏手机（360-374px） */
+@media (min-width: 360px) and (max-width: 374px) {
+  html { font-size: 15px; }
+}
+
+/* 标准手机（375-414px）- 默认，无需额外处理 */
+
+/* 大屏手机（415px+） */
+@media (min-width: 415px) {
+  html { font-size: 17px; }
+}
+
+/* 平板/桌面（768px+）- 限制最大宽度 */
+@media (min-width: 768px) {
+  #root {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
+
+/* 微信内置浏览器底部工具栏适配 */
 @media (display-mode: standalone) {
   body {
-    padding-top: 0;
+    padding-bottom: calc(var(--sab) + 50px);
+  }
+}
+
+/* 横屏时内容区域缩小 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .btn-comic-pink, .btn-comic-white {
+    padding: 8px 16px;
   }
 }
