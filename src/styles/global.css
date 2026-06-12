@@ -1,18 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ========== 设计变量（参考附件：亮黄主色 + 粉红强调色 + 墨黑描边） ========== */
 :root {
-  --bg-deep: #060608;
-  --bg-mid: #0d0d16;
-  --bg-card: #141420;
-  --gold: #f0a500;
-  --gold-light: #ffd666;
-  --red: #e63946;
-  --red-dark: #9d1f2c;
-  --text-main: #e8e6e3;
+  --bg: #FFE135;           /* 亮黄主背景 */
+  --bg-deep: #FFD400;      /* 深黄 */
+  --bg-soft: #FFF7E0;      /* 奶油白 */
+  --ink: #141414;          /* 粗黑描边 */
+  --ink-soft: #2a2a2a;
+  --pink: #FF2D7A;         /* 粉红强调色 */
+  --pink-deep: #C71585;    /* 深粉红 */
+  --cyan: #00C2B8;
+  --white: #FFFFFF;
 }
 
 * {
@@ -25,72 +27,105 @@ html,
 body,
 #root {
   width: 100%;
-  height: 100%;
-  background: var(--bg-deep);
-  color: var(--text-main);
-  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: '"ZCOOL KuaiLe"', 'Noto Sans SC', -apple-system, BlinkMacSystemFont,
+    'PingFang SC', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
 }
 
-/* ---------- 扫描线 ---------- */
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-  background: repeating-linear-gradient(0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px);
+/* ========== 主背景：斜条纹 + 轻微渐变（附件风格） ========== */
+body {
+  background-color: var(--bg);
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 212, 0, 0.55) 0px,
+      rgba(255, 212, 0, 0.55) 16px,
+      rgba(255, 225, 53, 1) 16px,
+      rgba(255, 225, 53, 1) 32px
+    );
+  background-attachment: fixed;
 }
 
-/* ---------- 自定义滚动条 ---------- */
-::-webkit-scrollbar {
-  width: 3px;
+/* ========== 漫画字体工具类 ========== */
+.font-comic {
+  font-family: '"ZCOOL KuaiLe"', 'Noto Sans SC', sans-serif;
+  letter-spacing: 1px;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* ========== 漫画文字描边（白字黑描边 / 黑字描边） ========== */
+.text-stroke-ink {
+  color: #fff;
+  -webkit-text-stroke: 2px var(--ink);
+  text-shadow:
+    3px 3px 0 var(--ink),
+    -1px -1px 0 var(--ink),
+    1px -1px 0 var(--ink),
+    -1px 1px 0 var(--ink);
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(240, 165, 0, 0.25);
-  border-radius: 10px;
+.text-stroke-thin {
+  -webkit-text-stroke: 1px var(--ink);
 }
 
-/* ---------- 浮动粒子 ---------- */
+.text-shadow-comic {
+  text-shadow: 3px 3px 0 var(--ink);
+}
+
+/* ========== 粗黑描边卡片（漫画风基础面板） ========== */
+.comic-card {
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 6px 6px 0 0 var(--ink);
+  background: #fff;
+}
+
+.comic-card-pink {
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--pink);
+  color: #fff;
+  box-shadow: 4px 4px 0 0 var(--ink);
+}
+
+/* ========== 徽章 / 标签（圆角粗黑描边） ========== */
+.comic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 13px;
+  box-shadow: 3px 3px 0 0 var(--ink);
+  background: #fff;
+  color: var(--ink);
+}
+
+/* ========== 浮动粒子：改为鲜艳 emoji/圆点，保持可识别度 ========== */
 @keyframes float-up {
   0% {
-    transform: translateY(100vh) scale(0);
+    transform: translateY(110vh) scale(0.4) rotate(0deg);
     opacity: 0;
   }
-
   10% {
     opacity: 1;
   }
-
   90% {
     opacity: 1;
   }
-
   100% {
-    transform: translateY(-10vh) scale(1);
+    transform: translateY(-10vh) scale(1) rotate(360deg);
     opacity: 0;
   }
 }
 
 .particle-wrapper {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
@@ -98,79 +133,82 @@ body::after {
 
 .particle {
   position: absolute;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--gold);
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid var(--ink);
   animation: float-up linear infinite;
-  opacity: 0.3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 2px 2px 0 0 var(--ink);
+  background: #fff;
 }
 
-/* ---------- 发光文字 ---------- */
-.glow-gold {
-  text-shadow:
-    0 0 20px rgba(240, 165, 0, 0.5),
-    0 0 60px rgba(240, 165, 0, 0.25),
-    0 0 100px rgba(240, 165, 0, 0.1);
-  color: var(--gold-light);
-}
-
-.glow-red {
-  text-shadow:
-    0 0 20px rgba(230, 57, 70, 0.5),
-    0 0 60px rgba(230, 57, 70, 0.2);
-  color: var(--red);
-}
-
-.glow-white {
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
-}
-
-/* ---------- 金边装饰 ---------- */
-.gold-border {
+/* ========== 小细节：分隔线/装饰 ========== */
+.comic-divider {
+  width: 100%;
+  height: 3px;
+  background: var(--ink);
   position: relative;
-  border: 1px solid rgba(240, 165, 0, 0.3);
-  box-shadow:
-    inset 0 0 30px rgba(240, 165, 0, 0.05),
-    0 0 20px rgba(240, 165, 0, 0.1);
+  margin: 14px 0;
+  border-radius: 2px;
 }
 
-/* ---------- 脉冲光环 ---------- */
-@keyframes pulse-ring {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(240, 165, 0, 0.4);
-  }
-
-  50% {
-    box-shadow: 0 0 0 18px rgba(240, 165, 0, 0);
-  }
+/* ========== 按钮：主色粉红 + 粗黑描边阴影 ========== */
+.btn-comic-pink {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 999px;
+  border: 3px solid var(--ink);
+  background: var(--pink);
+  color: #fff;
+  font-weight: 900;
+  font-size: 16px;
+  letter-spacing: 2px;
+  box-shadow: 5px 5px 0 0 var(--ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.pulse-ring {
-  animation: pulse-ring 2.5s ease-out infinite;
+.btn-comic-pink:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 0 var(--ink);
 }
 
-/* ---------- 数字滚动特效 ---------- */
-@keyframes count-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.btn-comic-pink:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 0 var(--ink);
 }
 
-.count-up {
-  animation: count-up 0.6s ease-out forwards;
+.btn-comic-white {
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 3px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 1px;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-/* ---------- 渐变文字 ---------- */
-.gradient-text-gold {
-  background: linear-gradient(135deg, #ffd666, #f0a500, #e68900);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.btn-comic-white:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 0 var(--ink);
 }
+
+.btn-comic-white:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 var(--ink);
+}
+
+/* ========== 波纹 / 轻微晃动 ========== */
+@keyframes wobble {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50% { transform: rotate(1.5deg); }
+}
+
+.wobble { animation: wobble 2s ease-in-out infinite; }

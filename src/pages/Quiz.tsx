@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { questions as setA } from '../data/questions';
@@ -26,7 +26,6 @@ const categoryLabels: Record<string, { icon: string; label: string }> = {
 export default function Quiz() {
   const navigate = useNavigate();
 
-  // 随机选择一套题库
   const [questionSet, setNameIndex] = useState(() => {
     const idx = Math.floor(Math.random() * allSets.length);
     return { set: allSets[idx], nameIndex: idx };
@@ -38,87 +37,122 @@ export default function Quiz() {
   const [answers, setAnswers] = useState<(number | null)[]>(() =>
     new Array(questions.length).fill(null)
   );
-  const [direction, setDirection] = useState(1);
 
   const currentQuestion = questions[currentIndex];
-  const cat = categoryLabels[currentQuestion.category] || { icon: '📋', label: currentQuestion.category };
+  const cat = categoryLabels[currentQuestion.category] || {
+    icon: '📋',
+    label: currentQuestion.category,
+  };
 
-  const handleSelect = useCallback((optionIndex: number) => {
-    if (answers[currentIndex] !== null) return;
+  const handleSelect = useCallback(
+    (optionIndex: number) => {
+      if (answers[currentIndex] !== null) return;
+      const newAnswers = [...answers];
+      newAnswers[currentIndex] = optionIndex;
+      setAnswers(newAnswers);
 
-    const newAnswers = [...answers];
-    newAnswers[currentIndex] = optionIndex;
-    setAnswers(newAnswers);
-    setDirection(1);
-
-    setTimeout(() => {
-      if (currentIndex < questions.length - 1) {
-        setCurrentIndex((prev) => prev + 1);
-        setDirection(1);
-      } else {
-        navigate('/result', {
-          state: {
-            answers: newAnswers,
-            questions: questions,
-            setName: setNames[questionSet.nameIndex],
-          },
-        });
-      }
-    }, 400);
-  }, [currentIndex, answers, navigate, questions, questionSet.nameIndex]);
+      setTimeout(() => {
+        if (currentIndex < questions.length - 1) {
+          setCurrentIndex((prev) => prev + 1);
+        } else {
+          navigate('/result', {
+            state: {
+              answers: newAnswers,
+              questions: questions,
+              setName: setNames[questionSet.nameIndex],
+            },
+          });
+        }
+      }, 350);
+    },
+    [currentIndex, answers, navigate, questions, questionSet.nameIndex]
+  );
 
   const handlePrev = () => {
-    if (currentIndex > 0) {
-      setDirection(-1);
-      setCurrentIndex((prev) => prev - 1);
-    }
+    if (currentIndex > 0) setCurrentIndex((prev) => prev - 1);
   };
 
   return (
-    <div className="min-h-screen flex flex-col relative">
-      <ParticleBg count={12} />
+    <div className="min-h-screen flex flex-col relative px-5 py-6">
+      <ParticleBg count={10} />
 
-      <header className="relative z-10 pt-6 pb-3 px-5">
-        <div className="max-w-lg mx-auto">
-          <ProgressBar current={currentIndex} total={questions.length} />
+      <header className="relative z-10 max-w-lg mx-auto w-full mb-5">
+        <ProgressBar current={currentIndex} total={questions.length} />
 
-          <div className="flex items-center justify-between mt-4">
-            <span className="inline-flex items-center gap-1.5 text-[10px] text-white/30 tracking-wider uppercase bg-white/[0.03] px-2.5 py-1 rounded-full border border-white/[0.04]">
-              <span>{cat.icon}</span>
-              <span>{cat.label}</span>
-            </span>
-            <span className="text-[10px] text-white/15 tracking-wider">
-              {setNames[questionSet.nameIndex]}
-            </span>
-          </div>
+        <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
+          {/* 分类徽章（白底 + 粗黑描边） */}
+          <span
+            className="font-black text-[12px] text-[#141414] px-3 py-1.5 rounded-full inline-flex items-center gap-1.5"
+            style={{
+              background: '#fff',
+              border: '3px solid #141414',
+              boxShadow: '3px 3px 0 0 #141414',
+              letterSpacing: 1,
+            }}
+          >
+            <span>{cat.icon}</span>
+            <span>{cat.label}</span>
+          </span>
+
+          {/* 题库版本小徽章（粉红） */}
+          <span
+            className="font-black text-[12px] text-white px-3 py-1.5 rounded-full"
+            style={{
+              background: '#FF2D7A',
+              border: '3px solid #141414',
+              boxShadow: '3px 3px 0 0 #141414',
+              letterSpacing: 1,
+            }}
+          >
+            {setNames[questionSet.nameIndex]}
+          </span>
         </div>
       </header>
 
-      <main className="flex-1 relative z-10 px-5 pb-28">
-        <AnimatePresence mode="wait" custom={direction}>
+      <main className="flex-1 relative z-10 max-w-lg mx-auto w-full pb-28">
+        <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            custom={direction}
-            className="max-w-lg mx-auto"
-            initial={{ opacity: 0, x: 50 * direction }}
+            initial={{ opacity: 0, x: 60 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 * direction }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            exit={{ opacity: 0, x: -60 }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
           >
+            {/* 题目卡片（白底 + 粗黑描边 + 阴影 + 轻微倾斜） */}
             <motion.div
-              className="relative mt-2 mb-7 p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="relative mb-5 p-5 rounded-[20px]"
+              style={{
+                background: '#fff',
+                border: '4px solid #141414',
+                boxShadow: '6px 6px 0 0 #141414',
+                transform: 'rotate(-0.5deg)',
+              }}
+              initial={{ opacity: 0, y: 10, rotate: 0 }}
+              animate={{ opacity: 1, y: 0, rotate: -0.5 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-[#f0a500]/30 rounded-tl-lg" />
-              <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-[#f0a500]/30 rounded-br-lg" />
+              {/* 左上角小标签 */}
+              <div
+                className="absolute -top-3 -left-3 font-black text-[12px] text-white px-3 py-1.5 rounded-full"
+                style={{
+                  background: '#FF2D7A',
+                  border: '3px solid #141414',
+                  boxShadow: '3px 3px 0 0 #141414',
+                  letterSpacing: 1,
+                }}
+              >
+                Q{currentIndex + 1}
+              </div>
 
-              <h2 className="text-base font-medium text-white/95 leading-relaxed">
+              <h2
+                className="font-black text-[#141414] leading-relaxed pt-2"
+                style={{ fontSize: 18, letterSpacing: 1 }}
+              >
                 {currentQuestion.question}
               </h2>
             </motion.div>
 
+            {/* 选项列表 */}
             <div className="flex flex-col gap-3">
               {currentQuestion.options.map((option, idx) => (
                 <OptionCard
@@ -135,18 +169,16 @@ export default function Quiz() {
         </AnimatePresence>
       </main>
 
+      {/* 底部按钮区 */}
       {currentIndex > 0 && (
-        <footer className="fixed bottom-0 left-0 right-0 z-20 px-5 py-5">
-          <div className="max-w-lg mx-auto">
-            <button
-              onClick={handlePrev}
-              className="w-full py-3 rounded-xl border border-white/[0.08] bg-white/[0.02] text-white/30 text-sm
-                         backdrop-blur-md hover:border-white/15 hover:text-white/50 hover:bg-white/[0.04]
-                         active:scale-[0.98] transition-all duration-200"
-            >
-              返回上一题
-            </button>
-          </div>
+        <footer className="fixed bottom-0 left-0 right-0 z-20 px-5 py-5 max-w-lg mx-auto w-full">
+          <button
+            onClick={handlePrev}
+            className="btn-comic-white"
+            style={{ width: '100%' }}
+          >
+            ⬅ 返回上一题
+          </button>
         </footer>
       )}
     </div>
