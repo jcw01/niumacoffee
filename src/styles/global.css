@@ -30,7 +30,7 @@ body,
   min-height: 100%;
   background: var(--bg);
   color: var(--ink);
-  font-family: '"ZCOOL KuaiLe"', 'Noto Sans SC', -apple-system, BlinkMacSystemFont,
+  font-family: 'ZCOOL KuaiLe', 'Noto Sans SC', -apple-system, BlinkMacSystemFont,
     'PingFang SC', 'Microsoft YaHei', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -51,7 +51,7 @@ body {
 
 /* ========== 漫画字体工具类 ========== */
 .font-comic {
-  font-family: '"ZCOOL KuaiLe"', 'Noto Sans SC', sans-serif;
+  font-family: 'ZCOOL KuaiLe', 'Noto Sans SC', sans-serif;
   letter-spacing: 1px;
 }
 
@@ -59,11 +59,9 @@ body {
 .text-stroke-ink {
   color: #fff;
   -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
   text-shadow:
-    3px 3px 0 var(--ink),
-    -1px -1px 0 var(--ink),
-    1px -1px 0 var(--ink),
-    -1px 1px 0 var(--ink);
+    3px 3px 0 var(--ink);
 }
 
 .text-stroke-thin {
