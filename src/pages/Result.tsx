@@ -4,9 +4,11 @@ import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import type { Question } from '../data/questions';
+import { levels } from '../data/levels';
 import { calculateScore } from '../utils/calculator';
-import { getOrCreateShareCode, saveLastResult } from '../utils/storage';
+import { getOrCreateShareCode, saveLastResult, isHiddenLevelUnlocked, getInviteCount } from '../utils/storage';
 import { generateShareText, shareToWeb } from '../utils/share';
+import { trackEvent } from '../utils/analytics';
 import ParticleBg from '../components/ParticleBg';
 
 interface LocationState {
@@ -44,6 +46,13 @@ export default function Result() {
       state.answers.map((a, i) => ({ questionId: i, optionIndex: a! })),
       state.questions
     );
+
+    // 隐藏等级逻辑：邀请3人解锁后，30%概率触发
+    const hiddenLevel = levels.find((l) => l.isHidden);
+    if (hiddenLevel && isHiddenLevelUnlocked() && Math.random() < 0.3) {
+      scoreResult.level = hiddenLevel;
+    }
+
     setResult(scoreResult);
     setShareCode(getOrCreateShareCode());
     saveLastResult({
@@ -74,6 +83,7 @@ export default function Result() {
 
   const handleShareToFriend = useCallback(async () => {
     if (!result) return;
+    trackEvent('share_click');
     const text = generateShareText(result.level.emoji, result.level.title, result.percentage, result.level.shareText);
     const status = await shareToWeb({
       title: text.title,
@@ -86,6 +96,7 @@ export default function Result() {
 
   const handleSaveImage = useCallback(async () => {
     if (!cardRef.current || !result) return;
+    trackEvent('image_save');
     try {
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: null,
@@ -378,6 +389,24 @@ export default function Result() {
               🔄 再测一次
             </button>
           </div>
+          {/* 邀请解锁隐藏等级提示 */}
+          {!isHiddenLevelUnlocked() && (
+            <div
+              style={{
+                background: '#FFF7E0',
+                border: '3px solid ' + INK,
+                borderRadius: 12,
+                boxShadow: '3px 3px 0 0 ' + INK,
+                padding: '8px 12px',
+                textAlign: 'center',
+                fontSize: 'clamp(11px, 2.8vw, 13px)',
+                fontWeight: 900,
+                color: INK,
+              }}
+            >
+              🐉 邀请3位好友解锁隐藏等级 · 已邀请 {getInviteCount()}/3
+            </div>
+          )}
         </motion.div>
       </div>
 

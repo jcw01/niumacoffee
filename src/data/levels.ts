@@ -12,6 +12,7 @@ export interface LevelConfig {
   poem: string;
   percentage: string;  // 如 "击败了 97% 的打工人"
   shareText: string;   // 社交分享短文案
+  isHidden?: boolean;  // 隐藏等级标记
 }
 
 export const levels: LevelConfig[] = [
@@ -104,5 +105,21 @@ export const levels: LevelConfig[] = [
     poem: '十年打工一场空，唯有病历最鲜红；老板眼中你最强，医生眼中你最惨。',
     percentage: '击败了 0.1% 的打工人',
     shareText: '纯血牛马王在此，谁敢跟我比惨？👑 病历比词典厚！',
+  },
+  {
+    minScore: -1,     // 特殊标记：隐藏等级，不通过分数触发
+    maxScore: -1,
+    level: 7,
+    emoji: '🐉',
+    title: '龙',
+    subtitle: '传说中的存在',
+    color: '#FFD700→#FF4500',
+    gradientFrom: '#FFD700',
+    gradientTo: '#FF4500',
+    comment: '你解锁了传说中的隐藏等级——龙！在牛马的世界里，龙是不存在的传说。据说只有邀请3位好友完成测试的人才能获得此殊荣。你是真正的社交牛马王！',
+    poem: '龙游浅水遭虾戏，虎落平阳被犬欺；如今翻身做龙去，牛马世界我称帝！',
+    percentage: '击败了 0.01% 的打工人',
+    shareText: '🐉 我解锁了隐藏等级「龙」！传说中只有邀请3位好友才能解锁的神秘等级！',
+    isHidden: true,
   },
 ];

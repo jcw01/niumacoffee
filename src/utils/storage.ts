@@ -54,15 +54,17 @@ interface QuizProgress {
   answers: (number | null)[];
   currentIndex: number;
   timestamp: number;
+  label?: string;
 }
 
 // 保存答题进度
-export function saveQuizProgress(questions: QuizProgress['questions'], answers: (number | null)[], currentIndex: number): void {
+export function saveQuizProgress(questions: QuizProgress['questions'], answers: (number | null)[], currentIndex: number, label?: string): void {
   localStorage.setItem(QUIZ_PROGRESS_KEY, JSON.stringify({
     questions,
     answers,
     currentIndex,
     timestamp: Date.now(),
+    label,
   }));
 }
 
@@ -86,4 +88,23 @@ export function loadQuizProgress(): QuizProgress | null {
 // 清除答题进度
 export function clearQuizProgress(): void {
   localStorage.removeItem(QUIZ_PROGRESS_KEY);
+}
+
+const INVITE_COUNT_KEY = 'nm_invite_count';
+
+// 获取邀请计数
+export function getInviteCount(): number {
+  return parseInt(localStorage.getItem(INVITE_COUNT_KEY) || '0', 10);
+}
+
+// 增加邀请计数（当有人通过分享链接进入时调用）
+export function incrementInviteCount(): number {
+  const count = getInviteCount() + 1;
+  localStorage.setItem(INVITE_COUNT_KEY, count.toString());
+  return count;
+}
+
+// 检查是否解锁隐藏等级（邀请3人）
+export function isHiddenLevelUnlocked(): boolean {
+  return getInviteCount() >= 3;
 }

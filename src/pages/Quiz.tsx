@@ -1,14 +1,18 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { questions as setA } from '../data/questions';
 import { questions as setB } from '../data/questions-b';
 import { questions as setC } from '../data/questions-c';
+import { questions as setCampus } from '../data/questions-campus';
+import { questions as setLove } from '../data/questions-love';
 import type { Question } from '../data/questions';
 import ProgressBar from '../components/ProgressBar';
 import OptionCard from '../components/OptionCard';
 import ParticleBg from '../components/ParticleBg';
 import { saveQuizProgress, loadQuizProgress, clearQuizProgress } from '../utils/storage';
+import { trackEvent } from '../utils/analytics';
+import { calculateScore } from '../utils/calculator';
 
 // Fisher-Yates 洗牌算法
 function shuffle<T>(arr: T[]): T[] {
@@ -20,13 +24,23 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// 从 3 套题库中各随机抽取，合并后打乱
-function buildMixedQuestions(): { questions: Question[]; label: string } {
-  const all = [setA, setB, setC];
-  // 每套随机抽 10 题，共 30 题
-  const picked = all.flatMap((set) => shuffle(set).slice(0, 10));
-  // 最终再打乱
-  return { questions: shuffle(picked), label: '混合随机版' };
+// 版本配置映射：每套版本的题库来源、抽题数量和显示标签
+const versionConfig: Record<string, { sets: Question[][]; count: number; label: string }> = {
+  workplace: { sets: [setA, setB, setC], count: 30, label: '🏢 职场牛马版' },
+  campus: { sets: [setCampus], count: 20, label: '🎓 校园牛马版' },
+  love: { sets: [setLove], count: 20, label: '💕 恋爱牛马版' },
+};
+
+// 根据版本从对应题库抽题
+function buildQuestions(version: string): { questions: Question[]; label: string } {
+  const config = versionConfig[version] || versionConfig.workplace;
+  if (config.sets.length === 1) {
+    return { questions: shuffle(config.sets[0]).slice(0, config.count), label: config.label };
+  }
+  // 多题库：各抽若干题合并打乱
+  const perSet = Math.ceil(config.count / config.sets.length);
+  const picked = config.sets.flatMap((set) => shuffle(set).slice(0, perSet));
+  return { questions: shuffle(picked).slice(0, config.count), label: config.label };
 }
 
 const categoryLabels: Record<string, { icon: string; label: string }> = {
@@ -42,14 +56,16 @@ const categoryLabels: Record<string, { icon: string; label: string }> = {
 
 export default function Quiz() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const version = (location.state as { version?: string })?.version || 'workplace';
 
-  // 尝试恢复进度，无则生成新题
+  // 尝试恢复进度，无则根据版本生成新题
   const [questionSet] = useState(() => {
     const saved = loadQuizProgress();
     if (saved) {
-      return { questions: saved.questions as Question[], label: '混合随机版' };
+      return { questions: saved.questions as Question[], label: saved.label || '混合随机版' };
     }
-    return buildMixedQuestions();
+    return buildQuestions(version);
   });
 
   const questions = questionSet.questions;
@@ -63,9 +79,14 @@ export default function Quiz() {
     return new Array(questions.length).fill(null);
   });
 
+  // 开始答题时埋点（仅首次进入）
+  useEffect(() => {
+    trackEvent('quiz_start', { version });
+  }, [version]);
+
   // 每次 answers 或 currentIndex 变化时自动保存进度
   useEffect(() => {
-    saveQuizProgress(questions, answers, currentIndex);
+    saveQuizProgress(questions, answers, currentIndex, questionSet.label);
   }, [questions, answers, currentIndex]);
 
   const currentQuestion = questions[currentIndex];
@@ -96,6 +117,11 @@ export default function Quiz() {
     } else {
       // 最后一题，跳转结果并清除进度
       clearQuizProgress();
+      const scoreResult = calculateScore(
+        answers.map((a, i) => ({ questionId: i, optionIndex: a! })),
+        questions
+      );
+      trackEvent('quiz_complete', { version, level: scoreResult.level.title });
       navigate('/result', {
         state: {
           answers,
@@ -115,13 +141,16 @@ export default function Quiz() {
   const [milestoneToast, setMilestoneToast] = useState<string | null>(null);
 
   useEffect(() => {
-    // 答完第10题进入第11题（index=10），答完第20题进入第21题（index=20）
-    if (currentIndex === 10) {
+    // 根据题目总数动态计算里程碑位置
+    const milestone1 = Math.floor(questions.length / 3);
+    const milestone2 = Math.floor(questions.length * 2 / 3);
+    if (currentIndex === milestone1) {
       setMilestoneToast('💪 已完成 1/3，继续加油！');
-    } else if (currentIndex === 20) {
-      setMilestoneToast('🔥 就剩 10 题了，冲刺！');
+    } else if (currentIndex === milestone2) {
+      const remaining = questions.length - milestone2;
+      setMilestoneToast(`🔥 就剩 ${remaining} 题了，冲刺！`);
     }
-  }, [currentIndex]);
+  }, [currentIndex, questions.length]);
 
   // 弹窗自动消失
   useEffect(() => {

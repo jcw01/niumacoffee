@@ -2,6 +2,19 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ParticleBg from '../components/ParticleBg';
 import { useState, useEffect } from 'react';
+import { questions as setA } from '../data/questions';
+import { questions as setB } from '../data/questions-b';
+import { questions as setC } from '../data/questions-c';
+import { questions as setCampus } from '../data/questions-campus';
+import { questions as setLove } from '../data/questions-love';
+import { trackEvent } from '../utils/analytics';
+
+// 题库版本配置
+const versions = [
+  { id: 'workplace', emoji: '🏢', name: '职场牛马版', desc: '打工人专属灵魂拷问', sets: [setA, setB, setC] },
+  { id: 'campus', emoji: '🎓', name: '校园牛马版', desc: '学生党的生存图鉴', sets: [setCampus] },
+  { id: 'love', emoji: '💕', name: '恋爱牛马版', desc: '舔狗等级鉴定', sets: [setLove] },
+];
 
 const emojis = ['🐂', '🐎', '🐕', '🐱', '🦄', '👑'];
 
@@ -22,6 +35,12 @@ if (typeof document !== 'undefined' && !document.getElementById(PULSE_KEYFRAMES_
 export default function Home() {
   const navigate = useNavigate();
   const [emojiIndex, setEmojiIndex] = useState(0);
+  const [selectedVersion, setSelectedVersion] = useState('workplace');
+
+  // 页面浏览埋点
+  useEffect(() => {
+    trackEvent('page_view', { page: 'home' });
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -157,9 +176,43 @@ export default function Home() {
           ))}
         </div>
 
+        {/* 题库版本选择器 */}
+        <div className="flex gap-2 mb-5 w-full" style={{ justifyContent: 'center' }}>
+          {versions.map((v, i) => {
+            const isSelected = selectedVersion === v.id;
+            return (
+              <motion.button
+                key={v.id}
+                onClick={() => setSelectedVersion(v.id)}
+                className="flex flex-col items-center rounded-[14px] font-black"
+                style={{
+                  flex: '1 1 0',
+                  maxWidth: 'clamp(100px, 28vw, 130px)',
+                  padding: 'clamp(8px, 2vw, 12px) clamp(4px, 1vw, 8px)',
+                  background: isSelected ? '#FFE135' : '#FFFFFF',
+                  border: isSelected ? '3px solid #FF2D7A' : '3px solid #141414',
+                  boxShadow: isSelected
+                    ? '4px 4px 0 0 #FF2D7A'
+                    : '4px 4px 0 0 #141414',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
+                }}
+                initial={{ opacity: 0, y: 16, scale: 0.85 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.4 + i * 0.1, type: 'spring', stiffness: 200 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span style={{ fontSize: 'clamp(20px, 5vw, 28px)', lineHeight: 1.2 }}>{v.emoji}</span>
+                <span style={{ fontSize: 'clamp(10px, 2.5vw, 13px)', color: '#141414', marginTop: 4 }}>{v.name}</span>
+                <span style={{ fontSize: 'clamp(8px, 2vw, 10px)', color: 'rgba(20,20,20,0.55)', marginTop: 2 }}>{v.desc}</span>
+              </motion.button>
+            );
+          })}
+        </div>
+
         {/* CTA 按钮 - 呼吸光效 */}
         <motion.button
-          onClick={() => navigate('/quiz')}
+          onClick={() => navigate('/quiz', { state: { version: selectedVersion } })}
           className="btn-comic-pink mb-1"
           style={{ animation: 'comic-breathe 2s ease-in-out infinite' }}
           initial={{ opacity: 0, y: 20 }}
