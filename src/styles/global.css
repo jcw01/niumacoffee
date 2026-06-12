@@ -4,15 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========== 设计变量（参考附件：亮黄主色 + 粉红强调色 + 墨黑描边） ========== */
+/* ========== 设计变量 ========== */
 :root {
-  --bg: #FFE135;           /* 亮黄主背景 */
-  --bg-deep: #FFD400;      /* 深黄 */
-  --bg-soft: #FFF7E0;      /* 奶油白 */
-  --ink: #141414;          /* 粗黑描边 */
+  --bg: #FFE135;
+  --bg-deep: #FFD400;
+  --bg-soft: #FFF7E0;
+  --ink: #141414;
   --ink-soft: #2a2a2a;
-  --pink: #FF2D7A;         /* 粉红强调色 */
-  --pink-deep: #C71585;    /* 深粉红 */
+  --pink: #FF2D7A;
+  --pink-deep: #C71585;
   --cyan: #00C2B8;
   --white: #FFFFFF;
 }
@@ -35,7 +35,6 @@ body,
   -webkit-font-smoothing: antialiased;
 }
 
-/* ========== 主背景：斜条纹 + 轻微渐变（附件风格） ========== */
 body {
   background-color: var(--bg);
   background-image:
@@ -49,30 +48,20 @@ body {
   background-attachment: fixed;
 }
 
-/* ========== 漫画字体工具类 ========== */
+/* ========== 漫画字体 ========== */
 .font-comic {
   font-family: 'ZCOOL KuaiLe', 'Noto Sans SC', sans-serif;
   letter-spacing: 1px;
 }
 
-/* ========== 漫画文字描边（白字黑描边 / 黑字描边） ========== */
-.text-stroke-ink {
-  color: #fff;
-  -webkit-text-stroke: 2px var(--ink);
-  paint-order: stroke fill;
-  text-shadow:
-    3px 3px 0 var(--ink);
+/* ========== 漫画标题阴影（黑字 + 偏移黑阴影，不溢出） ========== */
+.text-comic-title {
+  color: var(--ink);
+  text-shadow: 4px 4px 0 rgba(20, 20, 20, 0.15);
+  letter-spacing: 2px;
 }
 
-.text-stroke-thin {
-  -webkit-text-stroke: 1px var(--ink);
-}
-
-.text-shadow-comic {
-  text-shadow: 3px 3px 0 var(--ink);
-}
-
-/* ========== 粗黑描边卡片（漫画风基础面板） ========== */
+/* ========== 粗黑卡片 ========== */
 .comic-card {
   border: 3px solid var(--ink);
   border-radius: 16px;
@@ -80,15 +69,7 @@ body {
   background: #fff;
 }
 
-.comic-card-pink {
-  border: 3px solid var(--ink);
-  border-radius: 999px;
-  background: var(--pink);
-  color: #fff;
-  box-shadow: 4px 4px 0 0 var(--ink);
-}
-
-/* ========== 徽章 / 标签（圆角粗黑描边） ========== */
+/* ========== 徽章 ========== */
 .comic-badge {
   display: inline-flex;
   align-items: center;
@@ -103,18 +84,14 @@ body {
   color: var(--ink);
 }
 
-/* ========== 浮动粒子：改为鲜艳 emoji/圆点，保持可识别度 ========== */
+/* ========== 浮动粒子 ========== */
 @keyframes float-up {
   0% {
     transform: translateY(110vh) scale(0.4) rotate(0deg);
     opacity: 0;
   }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
   100% {
     transform: translateY(-10vh) scale(1) rotate(360deg);
     opacity: 0;
@@ -144,7 +121,7 @@ body {
   background: #fff;
 }
 
-/* ========== 小细节：分隔线/装饰 ========== */
+/* ========== 分隔线 ========== */
 .comic-divider {
   width: 100%;
   height: 3px;
@@ -154,7 +131,7 @@ body {
   border-radius: 2px;
 }
 
-/* ========== 按钮：主色粉红 + 粗黑描边阴影 ========== */
+/* ========== 按钮 ========== */
 .btn-comic-pink {
   width: 100%;
   padding: 14px 20px;
@@ -168,12 +145,10 @@ body {
   box-shadow: 5px 5px 0 0 var(--ink);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-
 .btn-comic-pink:hover {
   transform: translate(-1px, -1px);
   box-shadow: 6px 6px 0 0 var(--ink);
 }
-
 .btn-comic-pink:active {
   transform: translate(3px, 3px);
   box-shadow: 2px 2px 0 0 var(--ink);
@@ -192,21 +167,17 @@ body {
   box-shadow: 4px 4px 0 0 var(--ink);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-
 .btn-comic-white:hover {
   transform: translate(-1px, -1px);
   box-shadow: 5px 5px 0 0 var(--ink);
 }
-
 .btn-comic-white:active {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0 0 var(--ink);
 }
 
-/* ========== 波纹 / 轻微晃动 ========== */
 @keyframes wobble {
   0%, 100% { transform: rotate(-1.5deg); }
   50% { transform: rotate(1.5deg); }
 }
-
 .wobble { animation: wobble 2s ease-in-out infinite; }

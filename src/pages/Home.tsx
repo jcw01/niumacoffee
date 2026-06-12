@@ -17,14 +17,16 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-x-hidden px-5 py-8">
+    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-x-hidden px-4 py-6">
       <ParticleBg count={18} />
 
       <div className="relative z-10 max-w-md w-full flex flex-col items-center">
-        {/* ---- 顶部徽章 ---- */}
+        {/* 顶部粉红横幅 */}
         <motion.div
-          className="px-4 py-2 mb-5 rounded-full bg-[#FF2D7A] text-white font-black text-xs tracking-widest whitespace-nowrap"
+          className="px-4 py-2 mb-5 rounded-full font-black text-xs tracking-widest whitespace-nowrap"
           style={{
+            background: '#FF2D7A',
+            color: '#fff',
             border: '3px solid #141414',
             boxShadow: '4px 4px 0 0 #141414',
           }}
@@ -35,56 +37,54 @@ export default function Home() {
           🚨 牛马等级鉴定中心 · 限时免费
         </motion.div>
 
-        {/* ---- 标题大卡 ---- */}
+        {/* 标题大卡 */}
         <motion.div
-          className="w-full mb-6 px-5 py-7 rounded-[22px] bg-white text-center"
+          className="w-full mb-6 px-5 py-8 rounded-[22px] bg-white text-center"
           style={{
             border: '4px solid #141414',
             boxShadow: '8px 8px 0 0 #141414',
-            overflow: 'visible',
           }}
           initial={{ scale: 0.85, rotate: -3, opacity: 0 }}
           animate={{ scale: 1, rotate: -1, opacity: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 160, damping: 14 }}
         >
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="text-xs font-black tracking-[4px] text-[#141414] bg-[#FFE135] px-3 py-1 rounded-full"
-              style={{ border: '2px solid #141414' }}>
-              ZOO·RANK
-            </span>
-          </div>
+          {/* ZOO·RANK 标签 */}
+          <span
+            className="inline-block mb-5 text-xs font-black tracking-[4px] px-3 py-1.5 rounded-full"
+            style={{ background: '#FFE135', border: '2px solid #141414', color: '#141414' }}
+          >
+            ZOO·RANK
+          </span>
 
-          {/* 主标题：单行大号白字黑描边 */}
+          {/* 主标题：黑字 + 漫画阴影，不会溢出 */}
           <h1
-            className="font-black leading-tight mb-3 text-stroke-ink"
-            style={{
-              fontSize: 'clamp(36px, 10vw, 48px)',
-              letterSpacing: '2px',
-              lineHeight: 1.15,
-            }}
+            className="font-black leading-snug mb-1 text-comic-title"
+            style={{ fontSize: 'clamp(36px, 10vw, 50px)' }}
           >
             牛马等级
           </h1>
           <h2
-            className="font-black leading-tight mb-5 text-stroke-ink"
-            style={{
-              fontSize: 'clamp(36px, 10vw, 48px)',
-              lineHeight: 1.15,
-            }}
+            className="font-black leading-snug mb-5 text-comic-title"
+            style={{ fontSize: 'clamp(36px, 10vw, 50px)' }}
           >
             测 · 试
           </h2>
 
           <p
-            className="font-black text-[#141414] mb-4"
-            style={{ fontSize: '15px', letterSpacing: '2px' }}
+            className="font-black mb-4 tracking-[2px]"
+            style={{ fontSize: 15, color: '#141414' }}
           >
             测测你是哪种牛马 🐂🐎
           </p>
 
+          {/* Emoji 大圆 */}
           <motion.div
-            className="mx-auto w-20 h-20 rounded-full bg-[#FFE135] flex items-center justify-center"
-            style={{ border: '4px solid #141414', boxShadow: '4px 4px 0 0 #141414' }}
+            className="mx-auto w-20 h-20 rounded-full flex items-center justify-center"
+            style={{
+              background: '#FFE135',
+              border: '4px solid #141414',
+              boxShadow: '4px 4px 0 0 #141414',
+            }}
             animate={{ rotate: [0, -4, 4, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -92,7 +92,7 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        {/* ---- 标签说明行 ---- */}
+        {/* 标签行 */}
         <motion.div
           className="flex flex-wrap items-center justify-center gap-2 mb-6"
           initial={{ opacity: 0, y: 12 }}
@@ -120,6 +120,7 @@ export default function Home() {
           ))}
         </motion.div>
 
+        {/* CTA 按钮 */}
         <motion.button
           onClick={() => navigate('/quiz')}
           className="btn-comic-pink mb-3"
@@ -142,18 +143,23 @@ export default function Home() {
           🔎 先看看规则
         </motion.button>
 
+        {/* 底部脚注 */}
         <motion.div
           className="w-full text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          <div
-            className="inline-block font-black text-[11px] text-[#141414] bg-white/70 px-4 py-2 rounded-full"
-            style={{ border: '2px solid #141414', letterSpacing: '2px' }}
+          <span
+            className="inline-block font-black text-[11px] px-4 py-2 rounded-full tracking-[2px]"
+            style={{
+              background: 'rgba(255,255,255,0.7)',
+              color: '#141414',
+              border: '2px solid #141414',
+            }}
           >
             本测试纯属娱乐 · 请勿对号入座 🫡
-          </div>
+          </span>
         </motion.div>
       </div>
     </div>
