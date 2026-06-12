@@ -353,4 +353,15 @@ export const questions: Question[] = [
       { label: 'D', text: '？？？我的青春我的年华我的头发我的颈椎我的失眠我的焦虑我的社交圈萎缩我的感情空白我错过的所有家人重要时刻……都喂了狗了而狗还说不够吃再加点班', score: 15 },
     ],
   },
+  {
+    id: 31,
+    category: 'life',
+    question: '你每天几点能真正闭上眼睛入睡？',
+    options: [
+      { label: 'A', text: '22点前，早睡早起身体好', score: 0 },
+      { label: 'B', text: '23点左右，正常作息', score: 5 },
+      { label: 'C', text: '凌晨1点，躺在床上刷手机到这个点才困', score: 10 },
+      { label: 'D', text: '凌晨2点以后——不是不困，是闭上眼脑子里全是明天要交的方案和没回完的消息', score: 15 },
+    ],
+  },
 ];

@@ -46,3 +46,44 @@ export function getLastResult(): StoredResult | null {
     return null;
   }
 }
+
+const QUIZ_PROGRESS_KEY = 'nm_quiz_progress';
+
+interface QuizProgress {
+  questions: { id: number; category: string; question: string; options: { label: string; text: string; score: number }[] }[];
+  answers: (number | null)[];
+  currentIndex: number;
+  timestamp: number;
+}
+
+// 保存答题进度
+export function saveQuizProgress(questions: QuizProgress['questions'], answers: (number | null)[], currentIndex: number): void {
+  localStorage.setItem(QUIZ_PROGRESS_KEY, JSON.stringify({
+    questions,
+    answers,
+    currentIndex,
+    timestamp: Date.now(),
+  }));
+}
+
+// 恢复答题进度（24小时内有效）
+export function loadQuizProgress(): QuizProgress | null {
+  const raw = localStorage.getItem(QUIZ_PROGRESS_KEY);
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(raw) as QuizProgress;
+    // 24小时过期
+    if (Date.now() - data.timestamp > 24 * 60 * 60 * 1000) {
+      clearQuizProgress();
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+// 清除答题进度
+export function clearQuizProgress(): void {
+  localStorage.removeItem(QUIZ_PROGRESS_KEY);
+}

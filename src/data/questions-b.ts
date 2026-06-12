@@ -342,4 +342,15 @@ export const questions: Question[] = [
       { label: 'D', text: '下辈子当一只猫——每天只需要晒太阳和等人喂。但想了想，猫可能也会被撸秃，我还是继续当人吧，至少还能假装热爱工作。', score: 15 },
     ],
   },
+  {
+    id: 31,
+    category: 'life',
+    question: '你的入睡仪式是什么？',
+    options: [
+      { label: 'A', text: '放下手机闭眼就着，睡眠质量一流', score: 0 },
+      { label: 'B', text: '看会儿书或听会儿音乐，慢慢入睡', score: 5 },
+      { label: 'C', text: '刷手机刷到眼皮打架，然后被手机砸脸', score: 10 },
+      { label: 'D', text: '躺在床上复盘今天的工作然后越想越焦虑然后打开手机回了两条消息然后发现已经两点了', score: 15 },
+    ],
+  },
 ];

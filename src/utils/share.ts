@@ -7,9 +7,9 @@ export function parseShareParam(): string | null {
   return params.get('share') || null;
 }
 
-export function generateShareText(levelEmoji: string, levelTitle: string, percentage: number) {
+export function generateShareText(levelEmoji: string, levelTitle: string, percentage: number, shareText?: string) {
   return {
-    title: `我是${levelEmoji}${levelTitle}，你呢？测测你的牛马等级`,
+    title: shareText || `我是${levelEmoji}${levelTitle}，你呢？测测你的牛马等级`,
     desc: `我的牛马等级：${levelTitle}（${percentage}%）`,
   };
 }

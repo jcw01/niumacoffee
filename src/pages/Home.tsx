@@ -5,6 +5,20 @@ import { useState, useEffect } from 'react';
 
 const emojis = ['🐂', '🐎', '🐕', '🐱', '🦄', '👑'];
 
+// 呼吸光效 keyframes（注入到 document）
+const PULSE_KEYFRAMES_ID = 'comic-pulse-keyframes';
+if (typeof document !== 'undefined' && !document.getElementById(PULSE_KEYFRAMES_ID)) {
+  const style = document.createElement('style');
+  style.id = PULSE_KEYFRAMES_ID;
+  style.textContent = `
+    @keyframes comic-breathe {
+      0%, 100% { box-shadow: 0 0 8px 2px rgba(255,45,122,0.4), 4px 4px 0 0 #141414; }
+      50% { box-shadow: 0 0 22px 8px rgba(255,45,122,0.7), 4px 4px 0 0 #141414; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 export default function Home() {
   const navigate = useNavigate();
   const [emojiIndex, setEmojiIndex] = useState(0);
@@ -17,113 +31,137 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center relative overflow-x-hidden px-4 py-6">
+    <div className="min-h-screen flex flex-col items-center justify-center relative px-4 py-6">
+      {/* 粒子背景：z-0，在最底层 */}
       <ParticleBg count={18} />
 
+      {/* 内容区：z-10，在粒子之上 */}
       <div className="relative z-10 max-w-md w-full flex flex-col items-center">
         {/* 顶部粉红横幅 */}
         <motion.div
-          className="px-4 py-2 mb-5 rounded-full font-black text-xs tracking-widest whitespace-nowrap"
+          className="px-4 py-2 mb-4 rounded-full font-black text-[clamp(10px,3vw,12px)] tracking-widest whitespace-nowrap"
           style={{
             background: '#FF2D7A',
             color: '#fff',
             border: '3px solid #141414',
             boxShadow: '4px 4px 0 0 #141414',
           }}
-          initial={{ y: -30, opacity: 0, rotate: -6 }}
-          animate={{ y: 0, opacity: 1, rotate: -2 }}
-          transition={{ delay: 0.1, type: 'spring', stiffness: 180, damping: 12 }}
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 180 }}
         >
           🚨 牛马等级鉴定中心 · 限时免费
         </motion.div>
 
         {/* 标题大卡 */}
         <motion.div
-          className="w-full mb-6 px-5 py-8 rounded-[22px] bg-white text-center"
+          className="w-full mb-5 px-4 py-6 sm:px-6 sm:py-8 rounded-[20px] bg-white text-center"
           style={{
             border: '4px solid #141414',
-            boxShadow: '8px 8px 0 0 #141414',
+            boxShadow: '6px 6px 0 0 #141414',
           }}
-          initial={{ scale: 0.85, rotate: -3, opacity: 0 }}
-          animate={{ scale: 1, rotate: -1, opacity: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 160, damping: 14 }}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 160 }}
         >
           {/* ZOO·RANK 标签 */}
           <span
-            className="inline-block mb-5 text-xs font-black tracking-[4px] px-3 py-1.5 rounded-full"
-            style={{ background: '#FFE135', border: '2px solid #141414', color: '#141414' }}
+            className="inline-block mb-4 font-black tracking-[3px] px-3 py-1 rounded-full"
+            style={{
+              fontSize: 'clamp(10px, 2.5vw, 12px)',
+              background: '#FFE135',
+              border: '2px solid #141414',
+              color: '#141414',
+            }}
           >
             ZOO·RANK
           </span>
 
-          {/* 主标题：黑字 + 漫画阴影，不会溢出 */}
+          {/* 主标题 */}
           <h1
-            className="font-black leading-snug mb-1 text-comic-title"
-            style={{ fontSize: 'clamp(36px, 10vw, 50px)' }}
+            className="font-black leading-tight mb-1 text-comic-title"
+            style={{ fontSize: 'clamp(32px, 9vw, 50px)' }}
           >
             牛马等级
           </h1>
           <h2
-            className="font-black leading-snug mb-5 text-comic-title"
-            style={{ fontSize: 'clamp(36px, 10vw, 50px)' }}
+            className="font-black leading-tight mb-4 text-comic-title"
+            style={{ fontSize: 'clamp(32px, 9vw, 50px)' }}
           >
             测 · 试
           </h2>
 
           <p
-            className="font-black mb-4 tracking-[2px]"
-            style={{ fontSize: 15, color: '#141414' }}
+            className="font-black mb-4 tracking-[1px]"
+            style={{ fontSize: 'clamp(13px, 3.5vw, 15px)', color: '#141414' }}
           >
             测测你是哪种牛马 🐂🐎
           </p>
 
-          {/* Emoji 大圆 */}
-          <motion.div
-            className="mx-auto w-20 h-20 rounded-full flex items-center justify-center"
-            style={{
-              background: '#FFE135',
-              border: '4px solid #141414',
-              boxShadow: '4px 4px 0 0 #141414',
-            }}
-            animate={{ rotate: [0, -4, 4, 0] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <span key={emojiIndex} className="text-4xl">{emojis[emojiIndex]}</span>
-          </motion.div>
+          {/* Emoji 大圆 + 脉冲光环 */}
+          <div className="relative mx-auto" style={{ width: 'clamp(64px, 18vw, 80px)', height: 'clamp(64px, 18vw, 80px)' }}>
+            {/* 脉冲光环 */}
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              style={{ border: '3px solid #FFE135' }}
+              animate={{ scale: [1, 1.35, 1], opacity: [0.7, 0, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              style={{ border: '2px solid #FF2D7A' }}
+              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+            />
+            <motion.div
+              className="relative flex items-center justify-center w-full h-full"
+              style={{
+                borderRadius: 999,
+                background: '#FFE135',
+                border: '4px solid #141414',
+                boxShadow: '4px 4px 0 0 #141414',
+                lineHeight: 1,
+              }}
+              animate={{ rotate: [0, -4, 4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <span key={emojiIndex} style={{ fontSize: 'clamp(28px, 8vw, 40px)' }}>{emojis[emojiIndex]}</span>
+            </motion.div>
+          </div>
         </motion.div>
 
-        {/* 标签行 */}
-        <motion.div
-          className="flex flex-wrap items-center justify-center gap-2 mb-6"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-        >
+        {/* 标签行 - 交错入场 */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-5">
           {[
             { text: '30 道灵魂拷问', color: '#FFE135' },
             { text: '约 3 分钟', color: '#FFFFFF' },
             { text: '仅供娱乐 🤪', color: '#FF2D7A', fg: '#fff' },
           ].map((chip, i) => (
-            <span
+            <motion.span
               key={chip.text}
-              className="font-black text-[13px] px-4 py-2 rounded-full whitespace-nowrap"
+              className="font-black px-3 py-1.5 rounded-full whitespace-nowrap"
               style={{
+                fontSize: 'clamp(11px, 2.8vw, 13px)',
                 background: chip.color,
                 color: chip.fg || '#141414',
                 border: '3px solid #141414',
                 boxShadow: '3px 3px 0 0 #141414',
                 transform: `rotate(${i % 2 === 0 ? -2 : 2}deg)`,
               }}
+              initial={{ opacity: 0, y: 16, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.35 + i * 0.12, type: 'spring', stiffness: 200 }}
             >
               {chip.text}
-            </span>
+            </motion.span>
           ))}
-        </motion.div>
+        </div>
 
-        {/* CTA 按钮 */}
+        {/* CTA 按钮 - 呼吸光效 */}
         <motion.button
           onClick={() => navigate('/quiz')}
-          className="btn-comic-pink mb-3"
+          className="btn-comic-pink mb-1"
+          style={{ animation: 'comic-breathe 2s ease-in-out infinite' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 180 }}
@@ -132,30 +170,46 @@ export default function Home() {
           ⚡ 立即开始测试
         </motion.button>
 
+        {/* 社交证明 */}
+        <motion.p
+          className="mb-3 font-black"
+          style={{
+            fontSize: 'clamp(10px, 2.4vw, 12px)',
+            color: 'rgba(20,20,20,0.45)',
+            letterSpacing: '0.5px',
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+        >
+          已有 12,847+ 人完成测试
+        </motion.p>
+
         <motion.button
-          onClick={() => navigate('/quiz')}
-          className="btn-comic-white mb-6"
+          onClick={() => navigate('/rules')}
+          className="btn-comic-white mb-5"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
           whileTap={{ scale: 0.97 }}
         >
-          🔎 先看看规则
+          📖 先看看规则
         </motion.button>
 
         {/* 底部脚注 */}
         <motion.div
-          className="w-full text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
           <span
-            className="inline-block font-black text-[11px] px-4 py-2 rounded-full tracking-[2px]"
+            className="inline-block font-black px-3 py-1.5 rounded-full"
             style={{
+              fontSize: 'clamp(9px, 2.2vw, 11px)',
               background: 'rgba(255,255,255,0.7)',
               color: '#141414',
               border: '2px solid #141414',
+              letterSpacing: '1px',
             }}
           >
             本测试纯属娱乐 · 请勿对号入座 🫡

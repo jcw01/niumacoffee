@@ -23,7 +23,6 @@ export default function Result() {
   const navigate = useNavigate();
   const location = useLocation();
   const cardRef = useRef<HTMLDivElement>(null);
-
   const state = location.state as LocationState | null;
 
   const [result, setResult] = useState<ReturnType<typeof calculateScore> | null>(null);
@@ -75,7 +74,7 @@ export default function Result() {
 
   const handleShareToFriend = useCallback(async () => {
     if (!result) return;
-    const text = generateShareText(result.level.emoji, result.level.title, result.percentage);
+    const text = generateShareText(result.level.emoji, result.level.title, result.percentage, result.level.shareText);
     const status = await shareToWeb({
       title: text.title,
       text: text.desc,
@@ -107,11 +106,12 @@ export default function Result() {
   if (!result) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center gap-3 font-black text-[#141414]">
+        <div className="flex items-center gap-3 font-black" style={{ color: INK }}>
           <span
-            className="inline-block w-5 h-5 border-[3px] border-[#141414] border-t-[#FF2D7A] rounded-full animate-spin"
+            className="inline-block w-5 h-5 border-[3px] rounded-full animate-spin"
+            style={{ borderColor: INK, borderTopColor: PINK }}
           />
-          <span className="text-sm">正在演算你的牛马纯度...</span>
+          <span style={{ fontSize: 14 }}>正在演算你的牛马纯度...</span>
         </div>
       </div>
     );
@@ -120,10 +120,10 @@ export default function Result() {
   const level = result.level;
 
   return (
-    <div className="min-h-screen relative overflow-y-auto px-5 py-8">
+    <div className="min-h-screen relative overflow-y-auto px-4 py-6">
       <ParticleBg count={14} />
 
-      <div className="relative z-10 max-w-md mx-auto space-y-6 min-h-screen flex flex-col">
+      <div className="relative z-10 max-w-md mx-auto space-y-5 min-h-screen flex flex-col">
         {/* ========== 截图分享卡片 ========== */}
         <div
           ref={cardRef}
@@ -132,32 +132,28 @@ export default function Result() {
             width: '100%',
             maxWidth: 400,
             margin: '0 auto',
-            padding: 18,
-            borderRadius: 26,
-            // 外边框整体阴影
-            boxShadow: '8px 8px 0 0 ' + INK,
+            padding: 'clamp(12px, 3vw, 18px)',
+            borderRadius: 22,
             border: '4px solid ' + INK,
-            // 主背景：亮黄 + 斜纹（附件风格）
-            backgroundImage:
-              'repeating-linear-gradient(-45deg, #FFE135 0px, #FFE135 16px, #FFD400 16px, #FFD400 32px)',
+            boxShadow: '6px 6px 0 0 ' + INK,
             background: YELLOW,
           }}
         >
-          {/* 斜纹背景层（独立层不影响文字） */}
+          {/* 斜纹装饰层 */}
           <div
             style={{
               position: 'absolute',
               inset: 0,
-              borderRadius: 22,
+              borderRadius: 18,
               backgroundImage:
                 'repeating-linear-gradient(-45deg, rgba(255,212,0,0.9) 0px, rgba(255,212,0,0.9) 16px, rgba(255,225,53,1) 16px, rgba(255,225,53,1) 32px)',
-              opacity: 0.55,
+              opacity: 0.5,
               pointerEvents: 'none',
             }}
           />
 
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
-            {/* 顶部粉红横幅徽章 */}
+            {/* 顶部粉红横幅 */}
             <div
               style={{
                 alignSelf: 'center',
@@ -165,35 +161,35 @@ export default function Result() {
                 color: '#fff',
                 border: '3px solid ' + INK,
                 borderRadius: 999,
-                padding: '8px 18px',
+                padding: '6px 16px',
                 fontWeight: 900,
-                fontSize: 14,
+                fontSize: 'clamp(11px, 2.8vw, 14px)',
                 letterSpacing: 2,
                 boxShadow: '3px 3px 0 0 ' + INK,
-                marginBottom: 14,
+                marginBottom: 12,
                 transform: 'rotate(-2deg)',
               }}
             >
               🔥 你的牛马等级鉴定书
             </div>
 
-            {/* 内容主卡片（白底 + 粗黑描边） */}
+            {/* 内容主卡片 */}
             <div
               style={{
                 background: '#fff',
-                border: '4px solid ' + INK,
-                borderRadius: 22,
-                boxShadow: '5px 5px 0 0 ' + INK,
-                padding: '22px 18px 20px',
+                border: '3px solid ' + INK,
+                borderRadius: 18,
+                boxShadow: '4px 4px 0 0 ' + INK,
+                padding: 'clamp(14px, 3.5vw, 22px) clamp(12px, 3vw, 18px) clamp(12px, 3vw, 20px)',
                 textAlign: 'center',
-                marginBottom: 14,
+                marginBottom: 12,
               }}
             >
-              {/* emoji 大圆 */}
+              {/* emoji 大圆 - flex居中 + lineHeight:1 */}
               <div
                 style={{
-                  width: 100,
-                  height: 100,
+                  width: 'clamp(72px, 20vw, 100px)',
+                  height: 'clamp(72px, 20vw, 100px)',
                   margin: '0 auto 10px',
                   borderRadius: 999,
                   border: '4px solid ' + INK,
@@ -202,160 +198,117 @@ export default function Result() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 54,
+                  lineHeight: 1,
                 }}
               >
-                {level.emoji}
+                <span style={{ fontSize: 'clamp(36px, 10vw, 52px)', lineHeight: 1, display: 'block' }}>
+                  {level.emoji}
+                </span>
               </div>
 
               {/* 称号 */}
-              <div
-                style={{
-                  fontSize: 30,
-                  fontWeight: 900,
-                  color: INK,
-                  letterSpacing: 2,
-                  lineHeight: 1.2,
-                  marginBottom: 4,
-                }}
-              >
+              <div style={{ fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 900, color: INK, letterSpacing: 2, lineHeight: 1.3, marginBottom: 4, textRendering: 'optimizeLegibility' }}>
                 {level.title}
               </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  fontWeight: 900,
-                  color: PINK,
-                  letterSpacing: 4,
-                  marginBottom: 10,
-                }}
-              >
+              <div style={{ fontSize: 'clamp(9px, 2.2vw, 12px)', fontWeight: 700, color: PINK, letterSpacing: 3, marginBottom: 12, textRendering: 'optimizeLegibility' }}>
                 {level.subtitle.toUpperCase()}
               </div>
 
-              {/* 百分数字（大号） */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  justifyContent: 'center',
-                  gap: 4,
-                  marginBottom: 6,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 56,
-                    fontWeight: 900,
-                    color: INK,
-                    lineHeight: 1,
-                    letterSpacing: 1,
-                  }}
-                >
+              {/* 百分比大数字 - 加大下边距避免与击败文字重叠 */}
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 4, marginBottom: 16 }}>
+                <span style={{ fontSize: 'clamp(40px, 11vw, 60px)', fontWeight: 900, color: INK, lineHeight: 1.1, letterSpacing: 1, textRendering: 'optimizeLegibility' }}>
                   {scoreDisplay}
                 </span>
-                <span style={{ fontSize: 18, fontWeight: 900, color: PINK }}>%</span>
+                <span style={{ fontSize: 'clamp(16px, 4vw, 20px)', fontWeight: 900, color: PINK, lineHeight: 1.1, textRendering: 'optimizeLegibility' }}>%</span>
               </div>
 
-              {/* 小字说明 */}
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 900,
-                  color: INK,
-                  letterSpacing: 2,
-                  marginBottom: 12,
-                }}
-              >
+              {/* 击败信息 - pill/badge 样式 */}
+              <div style={{
+                display: 'inline-block',
+                background: YELLOW,
+                border: '2px solid ' + INK,
+                borderRadius: 999,
+                padding: '4px 14px',
+                fontSize: 'clamp(10px, 2.5vw, 12px)',
+                fontWeight: 900,
+                color: INK,
+                letterSpacing: 1,
+                marginBottom: 10,
+                boxShadow: '2px 2px 0 0 ' + INK,
+                textRendering: 'optimizeLegibility',
+              }}>
                 {result.totalScore} 分 · 击败 {level.percentage} 打工人
               </div>
 
-              {/* 分隔线 */}
-              <div
-                style={{
-                  width: '100%',
-                  height: 3,
-                  background: INK,
-                  borderRadius: 2,
-                  margin: '10px 0',
-                }}
-              />
+              {/* 社交传播文案 */}
+              <div style={{
+                fontSize: 'clamp(11px, 2.8vw, 13px)',
+                fontWeight: 900,
+                color: PINK,
+                letterSpacing: 1,
+                marginBottom: 14,
+                textRendering: 'optimizeLegibility',
+              }}>
+                {level.shareText}
+              </div>
 
-              {/* 打油诗（粉红背景 + 粗黑描边徽章框） */}
+              {/* 分隔线 */}
+              <div style={{ width: '100%', height: 3, background: INK, borderRadius: 2, margin: '8px 0' }} />
+
+              {/* 打油诗 */}
               <div
                 style={{
                   background: YELLOW,
                   border: '3px solid ' + INK,
-                  borderRadius: 14,
+                  borderRadius: 12,
                   boxShadow: '3px 3px 0 0 ' + INK,
-                  padding: '12px 14px',
-                  marginBottom: 12,
+                  padding: '10px 12px',
+                  marginBottom: 10,
                 }}
               >
-                <p
-                  style={{
-                    margin: 0,
-                    color: INK,
-                    fontSize: 14,
-                    fontWeight: 900,
-                    lineHeight: 1.8,
-                    whiteSpace: 'pre-line',
-                    letterSpacing: 0.5,
-                  }}
-                >
+                <p style={{ margin: 0, color: INK, fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 900, lineHeight: 1.8, whiteSpace: 'pre-line' }}>
                   {level.poem}
                 </p>
               </div>
 
-              {/* 评语（奶油背景框） */}
+              {/* 评语 */}
               <div
                 style={{
                   background: '#FFF7E0',
                   border: '3px solid ' + INK,
-                  borderRadius: 14,
+                  borderRadius: 12,
                   boxShadow: '3px 3px 0 0 ' + INK,
-                  padding: '12px 14px',
-                  marginBottom: 14,
+                  padding: '10px 12px',
+                  marginBottom: 12,
                   textAlign: 'left',
                 }}
               >
-                <p
-                  style={{
-                    margin: 0,
-                    color: INK,
-                    fontSize: 12.5,
-                    fontWeight: 700,
-                    lineHeight: 1.8,
-                    whiteSpace: 'pre-line',
-                    letterSpacing: 0.2,
-                  }}
-                >
+                <p style={{ margin: 0, color: INK, fontSize: 'clamp(11px, 2.8vw, 12.5px)', fontWeight: 700, lineHeight: 1.8, whiteSpace: 'pre-line' }}>
                   {level.comment}
                 </p>
               </div>
 
-              {/* 二维码区域 */}
+              {/* 二维码 */}
               <div
                 style={{
                   background: '#fff',
                   border: '3px solid ' + INK,
-                  borderRadius: 14,
+                  borderRadius: 12,
                   boxShadow: '3px 3px 0 0 ' + INK,
-                  padding: '10px 12px',
+                  padding: '8px 10px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 12,
+                  gap: 10,
                 }}
               >
                 <div
                   style={{
-                    width: 68,
-                    height: 68,
+                    width: 'clamp(52px, 14vw, 68px)',
+                    height: 'clamp(52px, 14vw, 68px)',
                     flexShrink: 0,
-                    background: '#fff',
                     border: '2px solid ' + INK,
-                    borderRadius: 10,
-                    padding: 4,
+                    borderRadius: 8,
+                    padding: 3,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -370,71 +323,65 @@ export default function Result() {
                   />
                 </div>
                 <div style={{ flex: 1, textAlign: 'left' }}>
-                  <p style={{ margin: 0, color: INK, fontSize: 13, fontWeight: 900, letterSpacing: 1 }}>
+                  <p style={{ margin: 0, color: INK, fontSize: 'clamp(11px, 2.8vw, 13px)', fontWeight: 900, letterSpacing: 1 }}>
                     扫码测你的牛马等级
                   </p>
-                  <p style={{ margin: '4px 0 0', color: PINK, fontSize: 12, fontWeight: 900, letterSpacing: 1 }}>
+                  <p style={{ margin: '3px 0 0', color: PINK, fontSize: 'clamp(10px, 2.5vw, 12px)', fontWeight: 900, letterSpacing: 1 }}>
                     看看你是哪种牛马 🐂🐎
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* 底部小水印 */}
+            {/* 底部水印 - 居中对齐 */}
             <div
               style={{
-                alignSelf: 'center',
-                background: '#fff',
-                color: INK,
-                border: '2px solid ' + INK,
-                borderRadius: 999,
-                padding: '4px 14px',
-                fontSize: 11,
-                fontWeight: 900,
-                letterSpacing: 2,
-                boxShadow: '2px 2px 0 0 ' + INK,
+                textAlign: 'center',
+                width: '100%',
               }}
             >
-              牛马测试 · 仅供娱乐
+              <span
+                style={{
+                  display: 'inline-block',
+                  background: '#fff',
+                  color: INK,
+                  border: '2px solid ' + INK,
+                  borderRadius: 999,
+                  padding: '3px 12px',
+                  fontSize: 'clamp(9px, 2.2vw, 11px)',
+                  fontWeight: 900,
+                  letterSpacing: 2,
+                  boxShadow: '2px 2px 0 0 ' + INK,
+                }}
+              >
+                牛马测试 · 仅供娱乐
+              </span>
             </div>
           </div>
         </div>
 
-        {/* ========== 操作按钮（漫画风） ========== */}
+        {/* ========== 操作按钮 ========== */}
         <motion.div
           className="space-y-3 flex-shrink-0 pb-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <button
-            onClick={handleShareToFriend}
-            className="btn-comic-pink"
-            style={{ width: '100%' }}
-          >
-            💬 分享给好友
+          <button onClick={handleShareToFriend} className="btn-comic-pink">
+            💅 让好友也来测
           </button>
-
           <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={handleSaveImage}
-              className="btn-comic-white"
-              style={{ width: '100%' }}
-            >
-              📷 保存图片
+            <button onClick={handleSaveImage} className="btn-comic-white">
+              📷 保存战绩图
             </button>
-            <button
-              onClick={() => navigate('/')}
-              className="btn-comic-white"
-              style={{ width: '100%' }}
-            >
+            <button onClick={() => navigate('/')} className="btn-comic-white">
               🔄 再测一次
             </button>
           </div>
         </motion.div>
       </div>
 
-      {/* ========== Toast ========== */}
+      {/* Toast */}
       {toast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
           <div
@@ -443,8 +390,8 @@ export default function Result() {
               color: INK,
               border: '3px solid ' + INK,
               boxShadow: '4px 4px 0 0 ' + INK,
-              borderRadius: 14,
-              padding: '10px 18px',
+              borderRadius: 12,
+              padding: '8px 16px',
               fontSize: 13,
               fontWeight: 900,
               letterSpacing: 1,
